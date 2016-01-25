@@ -58,48 +58,29 @@ public protocol PlatformSpecificController
         animated:Bool,
         completion: (() -> Void)?)
 #endif
-    
+
+    /**
+     Checks if view controller can handle given url.
+
+     - parameter url: NSURL
+
+     - returns: Bool
+     */
+    func canOpenURL(url:NSURL) -> Bool
+
+    /**
+     Opens the app with the given url
+
+     - parameter url: NSURL
+
+     - returns: Bool
+     */
+    func openURL(url: NSURL) -> Bool
 }
 
 #if os(OSX)
-    
-    //NSApplication extensions
-    //
-    extension NSApplication
-    {
-        /**
-         Checks if application can handle given url.
-         
-         - parameter url: NSURL
-         
-         - returns: Bool
-         */
-        public func canOpenURL(url:NSURL) -> Bool
-        {
-            return false
-        }
-        
-        /**
-         Opens the application with given url
-         
-         - parameter url: NSURL
-         
-         - returns: Bool
-         */
-        public func openURL(url:NSURL) -> Bool
-        {
-            if let authResult = Dropbox.handleRedirectURL(url) {
-                switch authResult {
-                case .Success(let token):
-                    print("Success! User is logged into Dropbox with token: \(token)")
-                case .Error(let error, let description):
-                    print("Error \(error): \(description)")
-                }
-            }
-            return true
-        }
-    }
-    
+
+
     //NSViewController extensions
     //See PlatformSpecificController protocol for documentation
     extension NSViewController:PlatformSpecificController
@@ -129,6 +110,29 @@ public protocol PlatformSpecificController
         {
             self.presentViewControllerAsModalWindow(controller)
             if let handler = completion { handler() }
+        }
+
+        public func canOpenURL(url: NSURL) -> Bool {
+            return false;
+        }
+
+        /**
+         Opens the application with given url
+
+         - parameter url: NSURL
+
+         - returns: Bool
+         */
+        public func openURL(url:NSURL) -> Bool {
+            if let authResult = Dropbox.handleRedirectURL(url) {
+                switch authResult {
+                case .Success(let token):
+                    print("Success! User is logged into Dropbox with token: \(token)")
+                case .Error(let error, let description):
+                    print("Error \(error): \(description)")
+                }
+            }
+            return true
         }
     }
     
@@ -164,5 +168,21 @@ public protocol PlatformSpecificController
         {
             self.presentViewController(controller, animated: true, completion: completion)
         }
+
+        public func canOpenURL(url: NSURL) -> Bool {
+            return UIApplication.sharedApplication().canOpenURL(url)
+        }
+
+        /**
+         Opens the application with given url
+
+         - parameter url: NSURL
+
+         - returns: Bool
+         */
+        public func openURL(url:NSURL) -> Bool {
+            return UIApplication.sharedApplication().openURL(url)
+        }
+
     }
 #endif

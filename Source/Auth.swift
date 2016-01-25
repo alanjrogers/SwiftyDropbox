@@ -317,20 +317,13 @@ public class DropboxAuthManager {
             return
         }
 #endif
-        
-        //Get platform specific app
-#if os(OSX)
-        let application = NSApp
-#else
-        let application = UIApplication.sharedApplication()
-#endif
-        
+
         //Use direct auth
-        if application.canOpenURL(dAuthURL(nil)) {
+        if controller.canOpenURL(dAuthURL(nil)) {
             
             self.directAuth({ (nonce) -> Void in
                 
-                application.openURL(self.dAuthURL(nonce))
+                controller.openURL(self.dAuthURL(nonce))
             })
             
         //Use Browser Auth
@@ -340,7 +333,7 @@ public class DropboxAuthManager {
                 
                 guard let redirectURL = url else { return }
                 
-                application.openURL(redirectURL)
+                controller.openURL(redirectURL)
             })
             
         //Use Web View Auth
@@ -349,7 +342,7 @@ public class DropboxAuthManager {
             self.webViewAuth(self.authURL(), controller: controller, redirectHandler: { (url) -> Bool in
                 
                 if self.canHandleURL(url) {
-                    application.openURL(url)
+                    controller.openURL(url)
                     return true
                 } else {
                     return false
