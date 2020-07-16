@@ -427,7 +427,11 @@ open class MobileSafariViewController: SFSafariViewController, SFSafariViewContr
     var cancelHandler: (() -> Void) = {}
 
     public init(url: URL, cancelHandler: @escaping (() -> Void)) {
-			  super.init(url: url, entersReaderIfAvailable: false)
+        let configuration = SFSafariViewController.Configuration()
+        configuration.entersReaderIfAvailable = false
+        configuration.barCollapsingEnabled = false
+        
+        super.init(url: url, configuration: configuration)
         self.cancelHandler = cancelHandler
         self.delegate = self;
     }
